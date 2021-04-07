@@ -32,6 +32,7 @@ from sklearn.model_selection import ShuffleSplit
 
 import utils
 
+device = th.device("cuda:0" if th.cuda.is_available() else "cpu") #todo add
 
 def load_data(dataset_name, splits_file_path=None, train_percentage=None, val_percentage=None, embedding_mode=None,
               embedding_method=None,
@@ -127,10 +128,9 @@ def load_data(dataset_name, splits_file_path=None, train_percentage=None, val_pe
                 G.remove_edge(node, node)
             G.add_edge(node, node, subgraph_idx=space_and_relation_type_to_idx_dict['self_loop'])
         adj = nx.adjacency_matrix(G, sorted(G.nodes()))
-        g = DGLGraph(adj)
-
+        g = DGLGraph(adj).to('cuda:0')
         for u, v, feature in G.edges(data='subgraph_idx'):
-            g.edges[g.edge_id(u, v)].data['subgraph_idx'] = th.tensor([feature])
+            g.edges[g.edge_id(u, v)].data['subgraph_idx'] = th.tensor([feature], device=device)
 
     if splits_file_path:
         with np.load(splits_file_path) as splits_file:
