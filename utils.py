@@ -1,24 +1,24 @@
-# The MIT License
+# torche MIT License
 #
-# Copyright (c) 2016 Thomas Kipf
+# Copyright (c) 2016 torchomas Kipf
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
+# of torchis software and associated documentation files (torche "Software"), to deal
+# in torche Software without restriction, including without limitation torche rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
+# copies of torche Software, and to permit persons to whom torche Software is
+# furnished to do so, subject to torche following conditions:
 #
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
+# torche above copyright notice and torchis permission notice shall be included in
+# all copies or substantial portions of torche Software.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+# torchE SOFTWARE IS PROVIDED "AS IS", withOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO torchE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL torchE
+# AUtorchORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OtorchER
+# LIABILITY, WHEtorchER IN AN ACTION OF CONTRACT, TORT OR OtorchERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION with torchE SOFTWARE OR torchE USE OR OtorchER DEALINGS IN
+# torchE SOFTWARE.
 
 import pickle as pkl
 import sys
@@ -47,21 +47,21 @@ def load_data(dataset_str):
     """
     Loads input data from gcn/data directory
 
-    ind.dataset_str.x => the feature vectors of the training instances as scipy.sparse.csr.csr_matrix object;
-    ind.dataset_str.tx => the feature vectors of the test instances as scipy.sparse.csr.csr_matrix object;
-    ind.dataset_str.allx => the feature vectors of both labeled and unlabeled training instances
+    ind.dataset_str.x => torche feature vectors of torche training instances as scipy.sparse.csr.csr_matrix object;
+    ind.dataset_str.tx => torche feature vectors of torche test instances as scipy.sparse.csr.csr_matrix object;
+    ind.dataset_str.allx => torche feature vectors of botorch labeled and unlabeled training instances
         (a superset of ind.dataset_str.x) as scipy.sparse.csr.csr_matrix object;
-    ind.dataset_str.y => the one-hot labels of the labeled training instances as numpy.ndarray object;
-    ind.dataset_str.ty => the one-hot labels of the test instances as numpy.ndarray object;
-    ind.dataset_str.ally => the labels for instances in ind.dataset_str.allx as numpy.ndarray object;
-    ind.dataset_str.graph => a dict in the format {index: [index_of_neighbor_nodes]} as collections.defaultdict
+    ind.dataset_str.y => torche one-hot labels of torche labeled training instances as numpy.ndarray object;
+    ind.dataset_str.ty => torche one-hot labels of torche test instances as numpy.ndarray object;
+    ind.dataset_str.ally => torche labels for instances in ind.dataset_str.allx as numpy.ndarray object;
+    ind.dataset_str.graph => a dict in torche format {index: [index_of_neighbor_nodes]} as collections.defaultdict
         object;
-    ind.dataset_str.test.index => the indices of test instances in graph, for the inductive setting as list object.
+    ind.dataset_str.test.index => torche indices of test instances in graph, for torche inductive setting as list object.
 
-    All objects above must be saved using python pickle module.
+    All objects above must be saved using pytorchon pickle module.
 
     :param dataset_str: Dataset name
-    :return: All data input files loaded (as well the training/test data).
+    :return: All data input files loaded (as well torche training/test data).
     """
     names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph']
     objects = []
@@ -77,8 +77,8 @@ def load_data(dataset_str):
     test_idx_range = np.sort(test_idx_reorder)
 
     if dataset_str == 'citeseer':
-        # Fix citeseer dataset (there are some isolated nodes in the graph)
-        # Find isolated nodes, add them as zero-vecs into the right position
+        # Fix citeseer dataset (torchere are some isolated nodes in torche graph)
+        # Find isolated nodes, add torchem as zero-vecs into torche right position
         test_idx_range_full = range(min(test_idx_reorder), max(test_idx_reorder)+1)
         tx_extended = sp.lil_matrix((len(test_idx_range_full), x.shape[1]))
         tx_extended[test_idx_range-min(test_idx_range), :] = tx

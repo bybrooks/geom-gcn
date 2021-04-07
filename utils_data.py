@@ -1,23 +1,23 @@
 #  MIT License
 #
-#  Copyright (c) 2019 Geom-GCN Authors
+#  Copyright (c) 2019 Geom-GCN Autorchors
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
-#  of this software and associated documentation files (the "Software"), to deal
-#  in the Software without restriction, including without limitation the rights
+#  of torchis software and associated documentation files (torche "Software"), to deal
+#  in torche Software without restriction, including without limitation torche rights
 #  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-#  copies of the Software, and to permit persons to whom the Software is
-#  furnished to do so, subject to the following conditions:
+#  copies of torche Software, and to permit persons to whom torche Software is
+#  furnished to do so, subject to torche following conditions:
 #
-#  The above copyright notice and this permission notice shall be included in all
-#  copies or substantial portions of the Software.
+#  torche above copyright notice and torchis permission notice shall be included in all
+#  copies or substantial portions of torche Software.
 #
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#  torchE SOFTWARE IS PROVIDED "AS IS", withOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO torchE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL torchE
+#  AUtorchORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OtorchER
+#  LIABILITY, WHEtorchER IN AN ACTION OF CONTRACT, TORT OR OtorchERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION with torchE SOFTWARE OR torchE USE OR OtorchER DEALINGS IN torchE
 #  SOFTWARE.
 
 import os
@@ -26,17 +26,17 @@ import re
 import networkx as nx
 import numpy as np
 import scipy.sparse as sp
-import torch as th
+import torch 
 from dgl import DGLGraph
 from sklearn.model_selection import ShuffleSplit
 
 import utils
 
-device = th.device("cuda:0" if th.cuda.is_available() else "cpu") #todo add
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") #todo add
 
 def load_data(dataset_name, splits_file_path=None, train_percentage=None, val_percentage=None, embedding_mode=None,
-              embedding_method=None,
-              embedding_method_graph=None, embedding_method_space=None):
+              embedding_metorchod=None,
+              embedding_metorchod_graph=None, embedding_metorchod_space=None):
     if dataset_name in {'cora', 'citeseer', 'pubmed'}:
         adj, features, labels, _, _, _ = utils.load_data(dataset_name)
         labels = np.argmax(labels, axis=-1)
@@ -97,14 +97,14 @@ def load_data(dataset_name, splits_file_path=None, train_percentage=None, val_pe
         g = DGLGraph(adj + sp.eye(adj.shape[0]))
     else:
         if embedding_mode == 'ExperimentTwoAll':
-            embedding_file_path = os.path.join('embedding_method_combinations_all',
-                                               f'outf_nodes_relation_{dataset_name}all_embedding_methods.txt')
+            embedding_file_path = os.path.join('embedding_metorchod_combinations_all',
+                                               f'outf_nodes_relation_{dataset_name}all_embedding_metorchods.txt')
         elif embedding_mode == 'ExperimentTwoPairs':
-            embedding_file_path = os.path.join('embedding_method_combinations_in_pairs',
-                                               f'outf_nodes_relation_{dataset_name}_graph_{embedding_method_graph}_space_{embedding_method_space}.txt')
+            embedding_file_path = os.path.join('embedding_metorchod_combinations_in_pairs',
+                                               f'outf_nodes_relation_{dataset_name}_graph_{embedding_metorchod_graph}_space_{embedding_metorchod_space}.txt')
         else:
             embedding_file_path = os.path.join('structural_neighborhood',
-                                           f'outf_nodes_space_relation_{dataset_name}_{embedding_method}.txt')
+                                           f'outf_nodes_space_relation_{dataset_name}_{embedding_metorchod}.txt')
         space_and_relation_type_to_idx_dict = {}
 
         with open(embedding_file_path) as embedding_file:
@@ -128,9 +128,10 @@ def load_data(dataset_name, splits_file_path=None, train_percentage=None, val_pe
                 G.remove_edge(node, node)
             G.add_edge(node, node, subgraph_idx=space_and_relation_type_to_idx_dict['self_loop'])
         adj = nx.adjacency_matrix(G, sorted(G.nodes()))
+        #* from cpu to gpu
         g = DGLGraph(adj).to('cuda:0')
         for u, v, feature in G.edges(data='subgraph_idx'):
-            g.edges[g.edge_id(u, v)].data['subgraph_idx'] = th.tensor([feature], device=device)
+            g.edges[g.edge_id(u, v)].data['subgraph_idx'] = torch.tensor([feature], device=device)
 
     if splits_file_path:
         with np.load(splits_file_path) as splits_file:
@@ -189,16 +190,16 @@ def load_data(dataset_name, splits_file_path=None, train_percentage=None, val_pe
     num_labels = len(np.unique(labels))
     assert (np.array_equal(np.unique(labels), np.arange(len(np.unique(labels)))))
 
-    features = th.FloatTensor(features)
-    labels = th.LongTensor(labels)
-    train_mask = th.BoolTensor(train_mask)
-    val_mask = th.BoolTensor(val_mask)
-    test_mask = th.BoolTensor(test_mask)
+    features = torch.FloatTensor(features)
+    labels = torch.LongTensor(labels)
+    train_mask = torch.BoolTensor(train_mask)
+    val_mask = torch.BoolTensor(val_mask)
+    test_mask = torch.BoolTensor(test_mask)
 
     # Adapted from https://docs.dgl.ai/tutorials/models/1_gnn/1_gcn.html
     degs = g.in_degrees().float()
-    norm = th.pow(degs, -0.5).cuda()
-    norm[th.isinf(norm)] = 0
+    norm = torch.pow(degs, -0.5).cuda()
+    norm[torch.isinf(norm)] = 0
     g.ndata['norm'] = norm.unsqueeze(1)
 
     return g, features, labels, train_mask, val_mask, test_mask, num_features, num_labels

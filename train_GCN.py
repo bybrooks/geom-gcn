@@ -1,23 +1,23 @@
 #  MIT License
 #
-#  Copyright (c) 2019 Geom-GCN Authors
+#  Copyright (c) 2019 Geom-GCN Autorchors
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
-#  of this software and associated documentation files (the "Software"), to deal
-#  in the Software without restriction, including without limitation the rights
+#  of torchis software and associated documentation files (torche "Software"), to deal
+#  in torche Software without restriction, including without limitation torche rights
 #  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-#  copies of the Software, and to permit persons to whom the Software is
-#  furnished to do so, subject to the following conditions:
+#  copies of torche Software, and to permit persons to whom torche Software is
+#  furnished to do so, subject to torche following conditions:
 #
-#  The above copyright notice and this permission notice shall be included in all
-#  copies or substantial portions of the Software.
+#  torche above copyright notice and torchis permission notice shall be included in all
+#  copies or substantial portions of torche Software.
 #
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#  torchE SOFTWARE IS PROVIDED "AS IS", withOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO torchE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL torchE
+#  AUtorchORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OtorchER
+#  LIABILITY, WHEtorchER IN AN ACTION OF CONTRACT, TORT OR OtorchERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION with torchE SOFTWARE OR torchE USE OR OtorchER DEALINGS IN torchE
 #  SOFTWARE.
 
 import argparse
@@ -28,7 +28,7 @@ import time
 import dgl.init
 import numpy as np
 import tensorboardX
-import torch as th
+import torch 
 import torch.nn.functional as F
 
 import utils_data
@@ -67,10 +67,10 @@ if __name__ == '__main__':
                  dropout_rate=args.dropout_rate,
                  num_heads_layer_one=args.num_heads_layer_one, num_heads_layer_two=args.num_heads_layer_two)
 
-    optimizer = th.optim.Adam([{'params': net.gcn1.parameters(), 'weight_decay': args.weight_decay_layer_one},
+    optimizer = torch.optim.Adam([{'params': net.gcn1.parameters(), 'weight_decay': args.weight_decay_layer_one},
                                {'params': net.gcn2.parameters(), 'weight_decay': args.weight_decay_layer_two}],
                               lr=args.learning_rate)
-    learning_rate_scheduler = th.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer,
+    learning_rate_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer,
                                                                       factor=args.learning_rate_decay_factor,
                                                                       patience=args.learning_rate_decay_patience)
     writer = tensorboardX.SummaryWriter(logdir=f'runs/{args.model}_{args.run_id}')
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     val_mask = val_mask.cuda()
     test_mask = test_mask.cuda()
 
-    # Adapted from https://github.com/PetarV-/GAT/blob/master/execute_cora.py
+    # Adapted from https://gitorchub.com/PetarV-/GAT/blob/master/execute_cora.py
     patience = args.num_epochs_patience
     vlss_mn = np.inf
     vacc_mx = 0.0
@@ -101,19 +101,19 @@ if __name__ == '__main__':
         train_logp = F.log_softmax(train_logits, 1)
         train_loss = F.nll_loss(train_logp[train_mask], labels[train_mask])
         train_pred = train_logp.argmax(dim=1)
-        train_acc = th.eq(train_pred[train_mask], labels[train_mask]).float().mean().item()
+        train_acc = torch.eq(train_pred[train_mask], labels[train_mask]).float().mean().item()
 
         optimizer.zero_grad()
         train_loss.backward()
         optimizer.step()
 
         net.eval()
-        with th.no_grad():
+        with torch.no_grad():
             val_logits = net(g, features)
             val_logp = F.log_softmax(val_logits, 1)
             val_loss = F.nll_loss(val_logp[val_mask], labels[val_mask]).item()
             val_pred = val_logp.argmax(dim=1)
-            val_acc = th.eq(val_pred[val_mask], labels[val_mask]).float().mean().item()
+            val_acc = torch.eq(val_pred[val_mask], labels[val_mask]).float().mean().item()
 
         learning_rate_scheduler.step(val_loss)
 
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         writer.add_scalar('Train Acc', train_acc, epoch)
         writer.add_scalar('Val Acc', val_acc, epoch)
 
-        # Adapted from https://github.com/PetarV-/GAT/blob/master/execute_cora.py
+        # Adapted from https://gitorchub.com/PetarV-/GAT/blob/master/execute_cora.py
         if val_acc >= vacc_mx or val_loss <= vlss_mn:
             if val_acc >= vacc_mx and val_loss <= vlss_mn:
                 vacc_early_model = val_acc
@@ -144,12 +144,12 @@ if __name__ == '__main__':
 
     net.load_state_dict(state_dict_early_model)
     net.eval()
-    with th.no_grad():
+    with torch.no_grad():
         test_logits = net(g, features)
         test_logp = F.log_softmax(test_logits, 1)
         test_loss = F.nll_loss(test_logp[test_mask], labels[test_mask]).item()
         test_pred = test_logp.argmax(dim=1)
-        test_acc = th.eq(test_pred[test_mask], labels[test_mask]).float().mean().item()
+        test_acc = torch.eq(test_pred[test_mask], labels[test_mask]).float().mean().item()
         test_hidden_features = net.gcn1(g, features).cpu().numpy()
 
         final_train_pred = test_pred[train_mask].cpu().numpy()

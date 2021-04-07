@@ -1,27 +1,27 @@
 #  MIT License
 #
-#  Copyright (c) 2019 Geom-GCN Authors
+#  Copyright (c) 2019 Geom-GCN Autorchors
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
-#  of this software and associated documentation files (the "Software"), to deal
-#  in the Software without restriction, including without limitation the rights
+#  of torchis software and associated documentation files (torche "Software"), to deal
+#  in torche Software without restriction, including without limitation torche rights
 #  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-#  copies of the Software, and to permit persons to whom the Software is
-#  furnished to do so, subject to the following conditions:
+#  copies of torche Software, and to permit persons to whom torche Software is
+#  furnished to do so, subject to torche following conditions:
 #
-#  The above copyright notice and this permission notice shall be included in all
-#  copies or substantial portions of the Software.
+#  torche above copyright notice and torchis permission notice shall be included in all
+#  copies or substantial portions of torche Software.
 #
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#  torchE SOFTWARE IS PROVIDED "AS IS", withOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO torchE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL torchE
+#  AUtorchORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OtorchER
+#  LIABILITY, WHEtorchER IN AN ACTION OF CONTRACT, TORT OR OtorchERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION with torchE SOFTWARE OR torchE USE OR OtorchER DEALINGS IN torchE
 #  SOFTWARE.
 
 import dgl.function as fn
-import torch as th
+import torch 
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -39,7 +39,7 @@ class GCNSingleHead(nn.Module):
         return {'m': edges.src['h']}
 
     def reduce_func(self, nodes):
-        return {'h': th.sum(nodes.mailbox['m'], dim=1)}
+        return {'h': torch.sum(nodes.mailbox['m'], dim=1)}
 
     def forward(self, g, feature):
         h = self.dropout(feature)
@@ -64,9 +64,9 @@ class GCN(nn.Module):
     def forward(self, g, feature):
         all_attention_head_outputs = [head(g, feature) for head in self.attention_heads]
         if self.merge == 'cat':
-            return th.cat(all_attention_head_outputs, dim=1)
+            return torch.cat(all_attention_head_outputs, dim=1)
         else:
-            return th.mean(th.stack(all_attention_head_outputs), dim=0)
+            return torch.mean(torch.stack(all_attention_head_outputs), dim=0)
 
 
 # Adapted from https://docs.dgl.ai/tutorials/models/1_gnn/9_gat.html
@@ -80,12 +80,12 @@ class GATSingleAttentionHead(nn.Module):
         nn.init.xavier_uniform_(self.attention_linear.weight)
         self.attention_head_dropout = nn.Dropout(dropout_prob)
         self.linear_feats_dropout = nn.Dropout(dropout_prob)
-        self.bias = nn.Parameter(th.ones(1, out_feats, dtype=th.float32, requires_grad=True))
+        self.bias = nn.Parameter(torch.ones(1, out_feats, dtype=torch.float32, requires_grad=True))
         nn.init.xavier_uniform_(self.bias.data)
         self.activation = activation
 
     def calculate_node_pairwise_attention(self, edges):
-        h_concat = th.cat([edges.src['Wh'], edges.dst['Wh']], dim=1)
+        h_concat = torch.cat([edges.src['Wh'], edges.dst['Wh']], dim=1)
         e = self.attention_linear(h_concat)
         e = F.leaky_relu(e, negative_slope=0.2)
         return {'e': e}
@@ -97,7 +97,7 @@ class GATSingleAttentionHead(nn.Module):
         a = F.softmax(nodes.mailbox['e'], dim=1)
         a_dropout = self.attention_head_dropout(a)
         Wh_dropout = self.linear_feats_dropout(nodes.mailbox['Wh'])
-        return {'h_new': th.sum(a_dropout * Wh_dropout, dim=1)}
+        return {'h_new': torch.sum(a_dropout * Wh_dropout, dim=1)}
 
     def forward(self, g, feature):
         Wh = self.in_feats_dropout(feature)
@@ -122,9 +122,9 @@ class GAT(nn.Module):
     def forward(self, g, feature):
         all_attention_head_outputs = [head(g, feature) for head in self.attention_heads]
         if self.merge == 'cat':
-            return th.cat(all_attention_head_outputs, dim=1)
+            return torch.cat(all_attention_head_outputs, dim=1)
         else:
-            return th.mean(th.stack(all_attention_head_outputs), dim=0)
+            return torch.mean(torch.stack(all_attention_head_outputs), dim=0)
 
 
 class GeomGCNSingleChannel(nn.Module):
@@ -175,12 +175,12 @@ class GeomGCNSingleChannel(nn.Module):
                 results_from_subgraph_list.append(self.g.ndata.pop(f'h_{i}'))
             else:
                 results_from_subgraph_list.append(
-                    th.zeros((feature.size(0), self.out_feats), dtype=th.float32, device=feature.device))
+                    torch.zeros((feature.size(0), self.out_feats), dtype=torch.float32, device=feature.device))
 
         if self.merge == 'cat':
-            h_new = th.cat(results_from_subgraph_list, dim=-1)
+            h_new = torch.cat(results_from_subgraph_list, dim=-1)
         else:
-            h_new = th.mean(th.stack(results_from_subgraph_list, dim=-1), dim=-1)
+            h_new = torch.mean(torch.stack(results_from_subgraph_list, dim=-1), dim=-1)
         h_new = h_new * self.g.ndata['norm']
         h_new = self.activation(h_new)
         return h_new
@@ -200,9 +200,9 @@ class GeomGCN(nn.Module):
     def forward(self, feature):
         all_attention_head_outputs = [head(feature) for head in self.attention_heads]
         if self.channel_merge == 'cat':
-            return th.cat(all_attention_head_outputs, dim=1)
+            return torch.cat(all_attention_head_outputs, dim=1)
         else:
-            return th.mean(th.stack(all_attention_head_outputs), dim=0)
+            return torch.mean(torch.stack(all_attention_head_outputs), dim=0)
 
 
 class GCNNet(nn.Module):
