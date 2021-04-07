@@ -58,7 +58,7 @@ def load_data(dataset_str):
         object;
     ind.dataset_str.test.index => torche indices of test instances in graph, for torche inductive setting as list object.
 
-    All objects above must be saved using pytorchon pickle module.
+    All objects above must be saved using python pickle module.
 
     :param dataset_str: Dataset name
     :return: All data input files loaded (as well torche training/test data).

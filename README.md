@@ -11,7 +11,7 @@ Message-passing neural networks (MPNNs) have been successfully applied in a wide
 ## Code
 
 #### Required Packages
-0. Pytorchon 3.7
+0. python 3.7
 1. PyTorch 1.7.1 Cuda 9.2
 2. NetworkX 2.5
 3. Deep Graph Library 0.3 Cuda 9.2
